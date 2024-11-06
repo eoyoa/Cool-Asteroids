@@ -3,7 +3,6 @@ import org.khronos.webgl.WebGLRenderingContext as GL //# GL# we need this for th
 import kotlin.js.Date
 import vision.gears.webglmath.UniformProvider
 import vision.gears.webglmath.Vec3
-import kotlin.math.*
 
 class Scene (
   val gl : WebGL2RenderingContext)  : UniformProvider("scene") {
@@ -40,34 +39,46 @@ class Scene (
 
   val avatar = object : PhysicsGameObject(avatarMesh){
     val gravity = Vec3(0f, -9.8f)
+    val controlVec = Vec3()
+
     override fun move(dt: Float, t: Float, keysPressed: Set<String>, gameObjects: List<GameObject>): Boolean {
-      force.set(gravity)
+      force.set(gravity + controlVec)
+      controlVec.set()
+
       return super.move(dt, t, keysPressed, gameObjects)
+    }
+
+    override fun control(dt: Float, t: Float, keysPressed: Set<String>, gameObjects: List<GameObject>): Boolean {
+      attemptJump(keysPressed)
+
+      var sideX = 0f
+      if ("A" in keysPressed) {
+        sideX -= 10f
+      }
+      if ("D" in keysPressed) {
+        sideX += 10f
+      }
+      controlVec.x = sideX
+
+      return super.control(dt, t, keysPressed, gameObjects)
+    }
+
+    fun attemptJump(keysPressed: Set<String>): Boolean {
+      if (velocity.y > 0) {
+        // you are not allowed to jump if you are already going up!
+        return false
+      }
+
+      if ("W" in keysPressed) {
+        velocity.y = -gravity.y
+        angularVelocity = 10f
+      }
+      return true
     }
   }
   init {
     gameObjects += GameObject(backgroundMesh)
     gameObjects += avatar
-  }
-
-  val asteroid = PhysicsGameObject(asteroidMesh).apply {
-    position.set(1.0f, 0.0f, 0.0f)
-    scale.set(1.0f, 1.0f, 1.0f)
-    radius = 1.0f
-  }
-  init {
-    gameObjects += asteroid
-  }
-
-  val asteroid2 = PhysicsGameObject(asteroidMesh).apply {
-    position.set(1.0f, 2.0f, 0.0f)
-    scale.set(2.0f, 2.0f, 1.0f)
-    radius = 2.0f
-    invMass = 0.0f
-    invAngularMass = 0.0f
-  }
-  init {
-    gameObjects += asteroid2
   }
 
   fun resize(canvas : HTMLCanvasElement) {
