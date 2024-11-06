@@ -2,7 +2,7 @@ import vision.gears.webglmath.Vec3
 import kotlin.math.cos
 import kotlin.math.sin
 
-class Player(mesh: Mesh, val projectileMesh: Mesh) : PhysicsGameObject(mesh){
+class Player(mesh: Mesh, val projectileMesh: Mesh, val explosionMesh: Mesh) : PhysicsGameObject(mesh){
     val gravity = Vec3(0f, -9.8f)
     val controlVec = Vec3()
     var projectileCooldown = 0f
@@ -44,8 +44,8 @@ class Player(mesh: Mesh, val projectileMesh: Mesh) : PhysicsGameObject(mesh){
         val ahead = Vec3 (cos (roll), sin (roll))
 
         val projectile = if ("SHIFT" in keysPressed)
-            BlackHoleProjectile(projectileMesh, this, ahead, gameObjects)
-        else Projectile(projectileMesh, this, ahead)
+            BlackHoleProjectile(projectileMesh, this, ahead, explosionMesh)
+        else Projectile(projectileMesh, this, ahead, explosionMesh)
         projectiles += projectile
         gameObjects += projectile
         projectileCooldown += 1f

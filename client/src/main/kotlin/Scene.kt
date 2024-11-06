@@ -25,12 +25,16 @@ class Scene (
   val projectileMaterial = Material(texturedProgram).apply {
     this["colorTexture"]?.set(Texture2D(gl, "media/plasma.png"))
   }
+  val explosionMaterial = Material(texturedProgram).apply{
+    this["colorTexture"]?.set(Texture2D(gl, "media/boom.png"))
+  }
 
   val texturedQuadGeometry = TexturedQuadGeometry(gl)
   val backgroundMesh = Mesh(backgroundMaterial, texturedQuadGeometry)
   val avatarMesh = Mesh(fighterMaterial, texturedQuadGeometry)
   val asteroidMesh = Mesh(asteroidMaterial, texturedQuadGeometry)
   val projectileMesh = Mesh(projectileMaterial, texturedQuadGeometry)
+  val explosionMesh = Mesh(explosionMaterial, texturedQuadGeometry)
   
   val camera = OrthoCamera().apply{
     position.set(1f, 1f)
@@ -43,7 +47,7 @@ class Scene (
     gameObjects += GameObject(backgroundMesh)
   }
 
-  val player = Player(avatarMesh, projectileMesh)
+  val player = Player(avatarMesh, projectileMesh, explosionMesh)
   init {
     gameObjects += player
   }

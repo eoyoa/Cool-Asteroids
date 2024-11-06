@@ -1,6 +1,6 @@
 import vision.gears.webglmath.Vec3
 
-class BlackHoleProjectile(projectileMesh: Mesh, player: Player, ahead: Vec3, gameObjects: List<GameObject>): Projectile(projectileMesh, player, ahead) {
+class BlackHoleProjectile(projectileMesh: Mesh, player: Player, ahead: Vec3, explosionMesh: Mesh): Projectile(projectileMesh, player, ahead, explosionMesh) {
     init {
         timeToDespawn = 20f
         invMass = 0.0001f

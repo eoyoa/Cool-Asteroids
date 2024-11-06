@@ -5,7 +5,7 @@ precision highp float;
 in vec4 texCoord;
 
 uniform struct {
-  sampler2D colorTexture; 
+  sampler2D colorTexture;
 } material;
 
 out vec4 fragmentColor;

@@ -17,9 +17,8 @@ open class Projectile(projectileMesh: Mesh, player: Player, ahead: Vec3, val exp
 
             if (it !is BlackHoleProjectile && dist < radius + it.radius) {
                 gameObjects.remove(it)
-                val boom = GameObject(explosionMesh).apply {
-
-                }
+                val boom = Explosion(explosionMesh, it.position)
+                gameObjects.add(boom)
             }
         }
     }
