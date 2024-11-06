@@ -41,7 +41,7 @@ class Scene (
   val avatar = object : PhysicsGameObject(avatarMesh){
     val gravity = Vec3(0f, -9.8f)
     override fun move(dt: Float, t: Float, keysPressed: Set<String>, gameObjects: List<GameObject>): Boolean {
-      force.plusAssign(gravity)
+      force.set(gravity)
       return super.move(dt, t, keysPressed, gameObjects)
     }
   }
