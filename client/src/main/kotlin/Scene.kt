@@ -2,10 +2,7 @@ import org.w3c.dom.HTMLCanvasElement
 import org.khronos.webgl.WebGLRenderingContext as GL //# GL# we need this for the constants declared ˙HUN˙ a constansok miatt kell
 import kotlin.js.Date
 import vision.gears.webglmath.UniformProvider
-import vision.gears.webglmath.Vec1
-import vision.gears.webglmath.Vec2
 import vision.gears.webglmath.Vec3
-import vision.gears.webglmath.Mat4
 import kotlin.math.*
 
 class Scene (
@@ -30,7 +27,7 @@ class Scene (
 
   val texturedQuadGeometry = TexturedQuadGeometry(gl)
   val backgroundMesh = Mesh(backgroundMaterial, texturedQuadGeometry)
-  val fighterMesh = Mesh(fighterMaterial, texturedQuadGeometry)
+  val avatarMesh = Mesh(fighterMaterial, texturedQuadGeometry)
   val asteroidMesh = Mesh(asteroidMaterial, texturedQuadGeometry)
   
   val camera = OrthoCamera().apply{
@@ -41,49 +38,16 @@ class Scene (
 
   var gameObjects = ArrayList<GameObject>()
 
-  val avatar = object : PhysicsGameObject(fighterMesh){
-    var thrust = 0.0f
-    override fun control (
-      dt : Float,
-      t : Float,
-      keysPressed : Set<String>,
-      gameObjects : List<GameObject>
-      ) : Boolean {
-        torque = 0.0f
-        if("A" in keysPressed) 
-        {
-          torque = 10.0f
-        }
-        if ("D" in keysPressed) {
-          torque = -10.0f
-        }
-        if ("A" in keysPressed && "D" in keysPressed) 
-        {
-          torque = 0.0f
-        } 
-        if("W" in keysPressed) 
-        {
-          thrust = 10.0f
-        }
-        else if("S" in keysPressed) 
-        {
-          thrust = -3.0f
-        }
-        else
-        {
-          thrust = 0.0f
-        }
-
-        val ahead = Vec3 (cos (roll), sin (roll), 0.0f)
-        force.set(ahead * thrust)
-
-        return true
-      }
+  val avatar = object : PhysicsGameObject(avatarMesh){
+    val gravity = Vec3(0f, -9.8f)
+    override fun move(dt: Float, t: Float, keysPressed: Set<String>, gameObjects: List<GameObject>): Boolean {
+      force.plusAssign(gravity)
+      return super.move(dt, t, keysPressed, gameObjects)
+    }
   }
   init {
     gameObjects += GameObject(backgroundMesh)
     gameObjects += avatar
-    avatar.roll = 1f
   }
 
   val asteroid = PhysicsGameObject(asteroidMesh).apply {
