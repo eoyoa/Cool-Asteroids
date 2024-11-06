@@ -1,0 +1,9 @@
+.gradle
+build/
+web/
+
+*.sublime-workspace
+Thumbs.db
+*.zip
+
+.DS_Store
