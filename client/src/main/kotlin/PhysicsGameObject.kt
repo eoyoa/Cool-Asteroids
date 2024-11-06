@@ -21,9 +21,12 @@ open class PhysicsGameObject(
 
     val preCollisionActions = ArrayList<(PhysicsGameObject) -> Boolean>()
     val collisionActions = ArrayList<(PhysicsGameObject) -> Unit>()
+    val specialCollisionActions = ArrayList<(PhysicsGameObject, MutableList<GameObject>) -> Unit>()
     init {
         collisionActions.add(::doCollisionMove)
     }
+
+    val forces = arrayListOf<Vec3>()
 
     open fun control(
         dt: Float,
@@ -50,6 +53,10 @@ open class PhysicsGameObject(
 
             for (shouldContinue in preCollisionActions) {
                 if (!shouldContinue(it)) return@forEach
+            }
+
+            for (action in specialCollisionActions) {
+                action(it, gameObjects as MutableList<GameObject>)
             }
 
             for (action in collisionActions) {
@@ -87,6 +94,8 @@ open class PhysicsGameObject(
         gameObjects: List<GameObject>
     ): Boolean {
         control(dt, t, keysPressed, gameObjects)
+
+        force.set(if (!forces.isEmpty()) forces.reduce { a, b -> a + b } else Vec3())
 
         acceleration.set(force * invMass)
         velocity += acceleration * dt

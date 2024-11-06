@@ -9,11 +9,17 @@ class Player(mesh: Mesh, val projectileMesh: Mesh) : PhysicsGameObject(mesh){
 
     val projectiles = arrayListOf<Projectile>()
 
+    init {
+        forces += gravity
+        forces += controlVec
+    }
+
     override fun move(dt: Float, t: Float, keysPressed: Set<String>, gameObjects: List<GameObject>): Boolean {
-        force.set(gravity + controlVec)
+        super.move(dt, t, keysPressed, gameObjects)
+
         controlVec.set()
 
-        return super.move(dt, t, keysPressed, gameObjects)
+        return true
     }
 
     override fun control(dt: Float, t: Float, keysPressed: Set<String>, gameObjects: List<GameObject>): Boolean {
@@ -36,17 +42,17 @@ class Player(mesh: Mesh, val projectileMesh: Mesh) : PhysicsGameObject(mesh){
         // you are allowed to shoot
 
         val ahead = Vec3 (cos (roll), sin (roll))
-        val projectile = Projectile(projectileMesh, this, ahead)
+
+        val projectile = if ("SHIFT" in keysPressed)
+            BlackHoleProjectile(projectileMesh, this, ahead, gameObjects)
+        else Projectile(projectileMesh, this, ahead)
         projectiles += projectile
         gameObjects += projectile
         projectileCooldown += 1f
     }
 
     private fun skipProjectileCollisions(it: PhysicsGameObject): Boolean {
-        if (it in projectiles) {
-            return false
-        }
-        return true
+        return it !in projectiles
     }
     init {
         preCollisionActions.add(::skipProjectileCollisions)
