@@ -2,7 +2,6 @@ import org.w3c.dom.HTMLCanvasElement
 import org.khronos.webgl.WebGLRenderingContext as GL //# GL# we need this for the constants declared ˙HUN˙ a constansok miatt kell
 import kotlin.js.Date
 import vision.gears.webglmath.UniformProvider
-import vision.gears.webglmath.Vec3
 
 class Scene (
   val gl : WebGL2RenderingContext)  : UniformProvider("scene") {
@@ -23,11 +22,15 @@ class Scene (
   val asteroidMaterial = Material(texturedProgram).apply{
     this["colorTexture"]?.set(Texture2D(gl, "media/asteroid.png"))
   }
+  val projectileMaterial = Material(texturedProgram).apply {
+    this["colorTexture"]?.set(Texture2D(gl, "media/plasma.png"))
+  }
 
   val texturedQuadGeometry = TexturedQuadGeometry(gl)
   val backgroundMesh = Mesh(backgroundMaterial, texturedQuadGeometry)
   val avatarMesh = Mesh(fighterMaterial, texturedQuadGeometry)
   val asteroidMesh = Mesh(asteroidMaterial, texturedQuadGeometry)
+  val projectileMesh = Mesh(projectileMaterial, texturedQuadGeometry)
   
   val camera = OrthoCamera().apply{
     position.set(1f, 1f)
@@ -36,49 +39,21 @@ class Scene (
   }
 
   var gameObjects = ArrayList<GameObject>()
-
-  val avatar = object : PhysicsGameObject(avatarMesh){
-    val gravity = Vec3(0f, -9.8f)
-    val controlVec = Vec3()
-
-    override fun move(dt: Float, t: Float, keysPressed: Set<String>, gameObjects: List<GameObject>): Boolean {
-      force.set(gravity + controlVec)
-      controlVec.set()
-
-      return super.move(dt, t, keysPressed, gameObjects)
-    }
-
-    override fun control(dt: Float, t: Float, keysPressed: Set<String>, gameObjects: List<GameObject>): Boolean {
-      attemptJump(keysPressed)
-
-      var sideX = 0f
-      if ("A" in keysPressed) {
-        sideX -= 10f
-      }
-      if ("D" in keysPressed) {
-        sideX += 10f
-      }
-      controlVec.x = sideX
-
-      return super.control(dt, t, keysPressed, gameObjects)
-    }
-
-    fun attemptJump(keysPressed: Set<String>): Boolean {
-      if (velocity.y > 0) {
-        // you are not allowed to jump if you are already going up!
-        return false
-      }
-
-      if ("W" in keysPressed) {
-        velocity.y = -gravity.y
-        angularVelocity = 10f
-      }
-      return true
-    }
-  }
   init {
     gameObjects += GameObject(backgroundMesh)
-    gameObjects += avatar
+  }
+
+  val player = Player(avatarMesh, projectileMesh)
+  init {
+    gameObjects += player
+  }
+
+  val platform = PhysicsGameObject(asteroidMesh).apply {
+    invMass = 0f
+  }
+  init {
+    platform.position.y = -10f
+    gameObjects += platform
   }
 
   fun resize(canvas : HTMLCanvasElement) {
@@ -99,7 +74,7 @@ class Scene (
     //TODO: set property time (reflecting uniform scene.time) 
     timeAtLastFrame = timeAtThisFrame
     
-    camera.position.set(avatar.position)
+    camera.position.set(player.position)
     camera.updateViewProjMatrix()
 
     gl.clearColor(0.3f, 0.0f, 0.3f, 1.0f)//## red, green, blue, alpha in [0, 1]
