@@ -11,13 +11,13 @@ open class Projectile(projectileMesh: Mesh, player: Player, ahead: Vec3, val exp
             it != player
         }
         collisionActions.clear()
-        specialCollisionActions.add { it, gameObjects ->
+        specialCollisionActions.add { it, gameObjects, t ->
             val diff = position - it.position
             val dist = diff.length()
 
             if (it !is BlackHoleProjectile && dist < radius + it.radius) {
                 gameObjects.remove(it)
-                val boom = Explosion(explosionMesh, it.position)
+                val boom = Explosion(explosionMesh, it.position, t)
                 gameObjects.add(boom)
             }
         }

@@ -11,5 +11,5 @@ uniform struct {
 out vec4 fragmentColor;
 
 void main(void) {
-  fragmentColor = texture(material.colorTexture, texCoord.xy); 
+  fragmentColor = texture(material.colorTexture, texCoord.xy);
 }

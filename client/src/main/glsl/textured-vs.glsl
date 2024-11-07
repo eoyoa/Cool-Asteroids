@@ -6,6 +6,7 @@ in vec4 vertexTexCoord;
 uniform struct{
   mat4 modelMatrix;
   float spriteScale;
+  vec2 offset;
 } gameObject;
 
 uniform struct{
@@ -24,5 +25,7 @@ void main(void) {
   modelPosition = vertexPosition;
   gl_Position = vertexPosition * gameObject.modelMatrix * camera.viewProjMatrix;
   worldPosition = gl_Position;
-  texCoord = vertexTexCoord * gameObject.spriteScale;
+  texCoord = vertexTexCoord;
+  texCoord.xy += gameObject.offset;
+  texCoord *= gameObject.spriteScale;
 }

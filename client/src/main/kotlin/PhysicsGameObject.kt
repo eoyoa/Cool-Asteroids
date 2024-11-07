@@ -21,7 +21,7 @@ open class PhysicsGameObject(
 
     val preCollisionActions = ArrayList<(PhysicsGameObject) -> Boolean>()
     val collisionActions = ArrayList<(PhysicsGameObject) -> Unit>()
-    val specialCollisionActions = ArrayList<(PhysicsGameObject, MutableList<GameObject>) -> Unit>()
+    val specialCollisionActions = ArrayList<(PhysicsGameObject, MutableList<GameObject>, Float) -> Unit>()
     init {
         collisionActions.add(::doCollisionMove)
     }
@@ -56,7 +56,7 @@ open class PhysicsGameObject(
             }
 
             for (action in specialCollisionActions) {
-                action(it, gameObjects as MutableList<GameObject>)
+                action(it, gameObjects as MutableList<GameObject>, t)
             }
 
             for (action in collisionActions) {

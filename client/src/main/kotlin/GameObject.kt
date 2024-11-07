@@ -1,4 +1,5 @@
 import vision.gears.webglmath.*
+import kotlin.math.floor
 
 open class GameObject(
   vararg val meshes : Mesh
@@ -9,9 +10,12 @@ open class GameObject(
   val scale = Vec3(1.0f, 1.0f, 1.0f)
 
   val modelMatrix by Mat4()
+
     var spriteScale by Vec1()
-    var spritesPerSheet = 1f
-    val offset by Vec3()
+    var spritesPerRow = 1f
+
+    val offset by Vec2()
+    var currentSprite = 0
 
   init { 
     addComponentsAndGatherUniforms(*meshes)
@@ -23,8 +27,8 @@ open class GameObject(
       rotate(roll).
       translate(position)
 
-      // TODO: refuses to recognize as uniform??
-      spriteScale.set(1/spritesPerSheet)
+      spriteScale.set(1/spritesPerRow)
+      offset.set(currentSprite % spritesPerRow, floor(currentSprite / spritesPerRow))
   }
 
   open fun move(
